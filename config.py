@@ -5,7 +5,9 @@ load_dotenv()
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key')
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///jkdatalab.db')
+    db_url = os.environ.get('DATABASE_URL', 'sqlite:///jkdatalab.db')
+    # Railway provides postgres:// but SQLAlchemy requires postgresql://
+    SQLALCHEMY_DATABASE_URI = db_url.replace('postgres://', 'postgresql://', 1) if db_url.startswith('postgres://') else db_url
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.zoho.in')
