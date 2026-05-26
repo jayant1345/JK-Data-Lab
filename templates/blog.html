@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Blog — JK Data Lab{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    <h1 class="page-title">AI & Data Science <span class="gradient-text">Blog</span></h1>
+    <p class="page-sub">Insights, tutorials, and case studies</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    {% if posts.items %}
+    <div class="blog-grid">
+      {% for post in posts.items %}
+      <div class="blog-card glass-card">
+        {% if post.cover_image %}
+          <img src="{{ url_for('static', filename=post.cover_image) }}" alt="{{ post.title }}" class="blog-cover">
+        {% else %}
+          <div class="blog-cover-placeholder"><span>Blog</span></div>
+        {% endif %}
+        <div class="blog-body">
+          {% if post.category %}<span class="blog-category">{{ post.category }}</span>{% endif %}
+          <h2 class="blog-title"><a href="{{ url_for('public.blog_detail', slug=post.slug) }}">{{ post.title }}</a></h2>
+          <p class="blog-date">{{ post.created_at.strftime('%B %d, %Y') }}</p>
+          <a href="{{ url_for('public.blog_detail', slug=post.slug) }}" class="btn btn-sm btn-outline">Read More →</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if posts.pages > 1 %}
+    <div class="pagination">
+      {% if posts.has_prev %}
+        <a href="{{ url_for('public.blog', page=posts.prev_num) }}" class="page-btn">← Prev</a>
+      {% endif %}
+      {% for p in posts.iter_pages() %}
+        {% if p %}
+          <a href="{{ url_for('public.blog', page=p) }}" class="page-btn {% if p == posts.page %}active{% endif %}">{{ p }}</a>
+        {% else %}
+          <span class="page-ellipsis">…</span>
+        {% endif %}
+      {% endfor %}
+      {% if posts.has_next %}
+        <a href="{{ url_for('public.blog', page=posts.next_num) }}" class="page-btn">Next →</a>
+      {% endif %}
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="empty-state">
+      <h3>Coming Soon</h3>
+      <p>AI and Data Science articles are being prepared. Check back soon!</p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}{{ project.title }} — JK Data Lab{% endblock %}
+{% block meta_desc %}{{ project.short_desc }}{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="{{ url_for('public.portfolio') }}">Portfolio</a> › {{ project.title }}
+    </div>
+    <h1 class="page-title">{{ project.title }}</h1>
+    <div class="project-meta-header">
+      <span class="project-category">{{ project.category }}</span>
+      {% if project.client_country %}<span>🌍 {{ project.client_country }}</span>{% endif %}
+      <span>👁 {{ project.views }} views</span>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="project-detail-grid">
+      <div class="project-detail-main">
+        {% if project.cover_image %}
+          <img src="{{ url_for('static', filename=project.cover_image) }}" alt="{{ project.title }}" class="project-cover">
+        {% endif %}
+        <div class="project-detail-content glass-card">
+          <h2>Project Overview</h2>
+          <div class="rich-content">{{ project.full_desc | safe }}</div>
+          {% if project.results %}
+          <div class="results-box">
+            <h3>📊 Results & Impact</h3>
+            <p>{{ project.results }}</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      <aside class="project-sidebar">
+        <div class="sidebar-card glass-card">
+          <h3>Project Details</h3>
+          <ul class="detail-list">
+            <li><strong>Category:</strong> {{ project.category }}</li>
+            {% if project.client_name %}<li><strong>Client:</strong> {{ project.client_name }}</li>{% endif %}
+            {% if project.client_country %}<li><strong>Country:</strong> {{ project.client_country }}</li>{% endif %}
+            {% if project.project_date %}<li><strong>Date:</strong> {{ project.project_date.strftime('%B %Y') }}</li>{% endif %}
+          </ul>
+          {% if project.tech_stack %}
+          <h3>Tech Stack</h3>
+          <div class="project-tags">
+            {% for tech in project.tech_list() %}
+              <span class="tag">{{ tech }}</span>
+            {% endfor %}
+          </div>
+          {% endif %}
+          <div class="sidebar-links">
+            {% if project.github_url %}
+              <a href="{{ project.github_url }}" target="_blank" class="btn btn-outline btn-sm">GitHub →</a>
+            {% endif %}
+            {% if project.live_url %}
+              <a href="{{ project.live_url }}" target="_blank" class="btn btn-primary btn-sm">Live Demo →</a>
+            {% endif %}
+          </div>
+        </div>
+        <div class="sidebar-card glass-card">
+          <h3>Interested in Similar Work?</h3>
+          <p>Let's discuss your project requirements.</p>
+          <a href="{{ url_for('public.contact') }}" class="btn btn-primary">Get Quote</a>
+        </div>
+      </aside>
+    </div>
+
+    {% if related %}
+    <div class="related-projects">
+      <h2>Related Projects</h2>
+      <div class="portfolio-grid">
+        {% for p in related %}
+        <div class="project-card glass-card">
+          <div class="project-img">
+            {% if p.cover_image %}
+              <img src="{{ url_for('static', filename=p.cover_image) }}" alt="{{ p.title }}">
+            {% else %}
+              <div class="project-img-placeholder"><span>{{ p.category }}</span></div>
+            {% endif %}
+          </div>
+          <div class="project-body">
+            <span class="project-category">{{ p.category }}</span>
+            <h3 class="project-title">{{ p.title }}</h3>
+            <p class="project-desc">{{ p.short_desc }}</p>
+            <a href="{{ url_for('public.portfolio_detail', slug=p.slug) }}" class="btn btn-sm btn-outline">View →</a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

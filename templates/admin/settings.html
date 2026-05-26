@@ -1,0 +1,62 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Settings — Admin{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Site Settings</h1>
+  <a href="{{ url_for('admin.export_db') }}" class="btn-admin-secondary">⬇ Export DB</a>
+</div>
+<form method="POST" class="admin-form">
+  {% macro setting_row(key, label, type='text') %}
+  <div class="form-group">
+    <label>{{ label }}</label>
+    {% if type == 'textarea' %}
+      <textarea name="{{ key }}" rows="3">{{ settings.get(key, '') }}</textarea>
+    {% else %}
+      <input type="{{ type }}" name="{{ key }}" value="{{ settings.get(key, '') }}">
+    {% endif %}
+  </div>
+  {% endmacro %}
+
+  <div class="settings-sections">
+    <div class="form-card">
+      <h3>Business Info</h3>
+      {{ setting_row('business_name', 'Business Name') }}
+      {{ setting_row('tagline', 'Tagline') }}
+      {{ setting_row('email', 'Contact Email') }}
+      {{ setting_row('phone', 'Phone') }}
+      {{ setting_row('address', 'Address', 'textarea') }}
+      {{ setting_row('udyam', 'MSME/Udyam Number') }}
+    </div>
+    <div class="form-card">
+      <h3>Social Links</h3>
+      {{ setting_row('linkedin', 'LinkedIn URL') }}
+      {{ setting_row('github', 'GitHub URL') }}
+      {{ setting_row('upwork', 'Upwork URL') }}
+      {{ setting_row('fiverr', 'Fiverr URL') }}
+      {{ setting_row('calendly', 'Calendly URL') }}
+      {{ setting_row('whatsapp', 'WhatsApp Number (with country code, no +)') }}
+    </div>
+    <div class="form-card">
+      <h3>SEO</h3>
+      {{ setting_row('meta_title', 'Meta Title') }}
+      {{ setting_row('meta_description', 'Meta Description', 'textarea') }}
+      {{ setting_row('meta_keywords', 'Meta Keywords') }}
+      {{ setting_row('google_analytics', 'Google Analytics ID') }}
+    </div>
+    <div class="form-card">
+      <h3>Hero Section</h3>
+      {{ setting_row('hero_headline', 'Hero Headline') }}
+      {{ setting_row('hero_subheadline', 'Hero Subheadline') }}
+    </div>
+    <div class="form-card">
+      <h3>Stats</h3>
+      {{ setting_row('stat_projects', 'Projects') }}
+      {{ setting_row('stat_clients', 'Clients') }}
+      {{ setting_row('stat_countries', 'Countries') }}
+      {{ setting_row('stat_years', 'Years Experience') }}
+    </div>
+  </div>
+  <button type="submit" class="btn-admin-primary">Save All Settings</button>
+</form>
+{% endblock %}

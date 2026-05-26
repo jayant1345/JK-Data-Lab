@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block title %}About Kinjal Jayswal — JK Data Lab{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    <h1 class="page-title">About <span class="gradient-text">JK Data Lab</span></h1>
+    <p class="page-sub">Meet the expert behind the data intelligence</p>
+  </div>
+</section>
+
+<section class="section about-section">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-photo">
+        <div class="photo-frame">
+          <div class="photo-placeholder">
+            <span>KJ</span>
+          </div>
+          <div class="photo-decoration"></div>
+        </div>
+        <div class="about-badges">
+          <span class="badge glass-card">🏆 MSME Registered</span>
+          <span class="badge glass-card">🌍 Global Clients</span>
+          <span class="badge glass-card">💡 AI Expert</span>
+        </div>
+      </div>
+      <div class="about-content">
+        <span class="section-tag">Who I Am</span>
+        <h2 class="section-title">Kinjal Jayantkumar <span class="gradient-text">Jayswal</span></h2>
+        <p class="about-bio">
+          I'm an AI and Data Science specialist with 5+ years of experience delivering intelligent solutions to global clients.
+          Currently working at Gujarat Technological University (GTU) in Ahmedabad while running JK Data Lab — my MSME-registered freelancing business.
+        </p>
+        <p class="about-bio">
+          I specialize in building end-to-end ML pipelines, NLP systems, RAG architectures, and interactive data dashboards
+          that turn complex raw data into actionable business intelligence. I've served 30+ clients across 10+ countries
+          on platforms like Upwork and Fiverr.
+        </p>
+        <div class="about-meta">
+          <div class="meta-item"><span>📍</span> Ahmedabad, Gujarat, India</div>
+          <div class="meta-item"><span>🏢</span> Gujarat Technological University (GTU)</div>
+          <div class="meta-item"><span>📧</span> kinjal@jkdatalab.com</div>
+          <div class="meta-item"><span>📞</span> +91-9157938887</div>
+        </div>
+        <div class="about-actions">
+          <a href="{{ url_for('public.contact') }}" class="btn btn-primary">Hire Me</a>
+          <a href="#" class="btn btn-outline">Download Resume</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Skills -->
+<section class="section skills-section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">Expertise</span>
+      <h2 class="section-title">Skills & <span class="gradient-text">Technologies</span></h2>
+    </div>
+    {% set categories = skills | groupby('category') %}
+    {% for category, cat_skills in categories %}
+    <div class="skill-category">
+      <h3 class="skill-cat-title">{{ category }}</h3>
+      <div class="skills-grid">
+        {% for skill in cat_skills %}
+        <div class="skill-item glass-card">
+          <div class="skill-header">
+            <span class="skill-name">{{ skill.name }}</span>
+            <span class="skill-pct">{{ skill.proficiency }}%</span>
+          </div>
+          <div class="skill-bar">
+            <div class="skill-fill" data-width="{{ skill.proficiency }}"></div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Timeline -->
+<section class="section timeline-section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">Journey</span>
+      <h2 class="section-title">Education & <span class="gradient-text">Experience</span></h2>
+    </div>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content glass-card">
+          <span class="timeline-year">2024 – Present</span>
+          <h3>IT Professional — Gujarat Technological University</h3>
+          <p>Working on AI/ML projects, data infrastructure, and technology initiatives at GTU, Ahmedabad.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content glass-card">
+          <span class="timeline-year">2021 – Present</span>
+          <h3>Founder — JK Data Lab</h3>
+          <p>Running AI & Data Science freelancing business. Delivered 50+ projects globally across Upwork, Fiverr, and direct clients.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content glass-card">
+          <span class="timeline-year">2019 – 2021</span>
+          <h3>Data Science Engineer</h3>
+          <p>Built ML models, dashboards, and analytics pipelines for enterprise clients in India.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content glass-card">
+          <span class="timeline-year">2015 – 2019</span>
+          <h3>B.E. — Computer/IT Engineering</h3>
+          <p>Bachelor's degree in Computer/IT Engineering from Gujarat Technological University.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Tools -->
+<section class="section tools-section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">Toolkit</span>
+      <h2 class="section-title">Tools & <span class="gradient-text">Frameworks</span></h2>
+    </div>
+    <div class="tools-grid">
+      {% set tools = ['Python', 'TensorFlow', 'PyTorch', 'Scikit-learn', 'Pandas', 'NumPy',
+                      'LangChain', 'OpenAI', 'HuggingFace', 'FAISS', 'Streamlit', 'Flask',
+                      'FastAPI', 'Power BI', 'Plotly', 'SQL', 'PostgreSQL', 'Docker', 'Git', 'Airflow'] %}
+      {% for tool in tools %}
+        <span class="tool-badge glass-card">{{ tool }}</span>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

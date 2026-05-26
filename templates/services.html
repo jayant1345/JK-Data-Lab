@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Services — JK Data Lab{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    <h1 class="page-title">Our <span class="gradient-text">Services</span></h1>
+    <p class="page-sub">Comprehensive AI & Data Science solutions for your business</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    {% for svc in services %}
+    <div class="service-detail glass-card" id="{{ svc.slug }}">
+      <div class="service-detail-header">
+        <div class="service-icon-lg">{{ svc.title[:2] }}</div>
+        <div>
+          <h2 class="service-detail-title">{{ svc.title[2:].strip() }}</h2>
+          <p class="service-detail-desc">{{ svc.description }}</p>
+        </div>
+      </div>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <h4>Basic</h4>
+          <p>{{ svc.pricing_basic or 'Contact for pricing' }}</p>
+        </div>
+        <div class="pricing-card pricing-featured">
+          <h4>Standard</h4>
+          <p>{{ svc.pricing_standard or 'Contact for pricing' }}</p>
+        </div>
+        <div class="pricing-card">
+          <h4>Premium</h4>
+          <p>{{ svc.pricing_premium or 'Contact for pricing' }}</p>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Process -->
+<section class="section process-section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">How We Work</span>
+      <h2 class="section-title">Our <span class="gradient-text">Process</span></h2>
+    </div>
+    <div class="process-steps">
+      {% for step, icon, desc in [
+        ('Discovery', '🔍', 'Understanding your requirements, data, and business goals.'),
+        ('Development', '⚙️', 'Building the solution with best practices and clean code.'),
+        ('Testing', '🧪', 'Rigorous testing to ensure accuracy and reliability.'),
+        ('Delivery', '🚀', 'Deploying the solution with documentation and training.'),
+        ('Support', '🛡️', 'Ongoing support and maintenance as needed.'),
+      ] %}
+      <div class="process-step">
+        <div class="step-num">{{ loop.index }}</div>
+        <div class="step-icon">{{ icon }}</div>
+        <h3>{{ step }}</h3>
+        <p>{{ desc }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section faq-section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">FAQ</span>
+      <h2 class="section-title">Frequently Asked <span class="gradient-text">Questions</span></h2>
+    </div>
+    <div class="faq-list">
+      {% for q, a in [
+        ('How long does a typical project take?', 'Project timelines vary from 1 week for simple automation tasks to 2-3 months for complex AI systems. I provide a detailed timeline estimate after the initial discovery call.'),
+        ('Do you sign NDAs?', 'Yes, I sign NDAs for all client projects to protect your intellectual property and data privacy.'),
+        ('What platforms do you work on?', 'I work with clients directly and through Upwork, Fiverr, and LinkedIn. Direct engagement usually results in better rates.'),
+        ('Do you provide post-delivery support?', 'Yes, I offer 30 days of free bug-fix support after delivery. Extended support packages are available.'),
+        ('Can you work with my existing team?', 'Absolutely. I can integrate with your existing team via GitHub, Jira, Slack, or any tool you use.'),
+      ] %}
+      <div class="faq-item glass-card">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+          {{ q }} <span class="faq-arrow">▼</span>
+        </button>
+        <div class="faq-answer"><p>{{ a }}</p></div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="cta-box glass-card">
+      <h2>Ready to Get Started?</h2>
+      <p>Let's discuss your project requirements and build something amazing.</p>
+      <a href="{{ url_for('public.contact') }}" class="btn btn-primary">Contact Us Today</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

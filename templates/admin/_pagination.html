@@ -1,0 +1,12 @@
+{% set pagination = projects if projects is defined else (posts if posts is defined else (messages if messages is defined else (testimonials if testimonials is defined else none))) %}
+{% if pagination and pagination.pages > 1 %}
+<div class="admin-pagination">
+  {% if pagination.has_prev %}
+    <a href="{{ request.url | replace('page=' + (pagination.page)|string, 'page=' + (pagination.prev_num)|string) if 'page=' in request.url else request.url + '?page=' + (pagination.prev_num)|string }}" class="page-btn">← Prev</a>
+  {% endif %}
+  <span>Page {{ pagination.page }} of {{ pagination.pages }}</span>
+  {% if pagination.has_next %}
+    <a href="{{ request.url | replace('page=' + (pagination.page)|string, 'page=' + (pagination.next_num)|string) if 'page=' in request.url else request.url + '?page=' + (pagination.next_num)|string }}" class="page-btn">Next →</a>
+  {% endif %}
+</div>
+{% endif %}

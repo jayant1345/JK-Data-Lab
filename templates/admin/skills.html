@@ -1,0 +1,35 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Skills — Admin{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Skills</h1>
+  <a href="{{ url_for('admin.skill_new') }}" class="btn-admin-primary">+ Add Skill</a>
+</div>
+<div class="table-card">
+  <table class="admin-table">
+    <thead>
+      <tr><th>Name</th><th>Category</th><th>Proficiency</th><th>Order</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      {% for s in skills %}
+      <tr>
+        <td>{{ s.name }}</td>
+        <td>{{ s.category }}</td>
+        <td>
+          <div class="mini-bar"><div class="mini-fill" style="width:{{ s.proficiency }}%"></div></div>
+          {{ s.proficiency }}%
+        </td>
+        <td>{{ s.order }}</td>
+        <td class="actions">
+          <a href="{{ url_for('admin.skill_edit', sid=s.id) }}" class="action-btn edit">Edit</a>
+          <form method="POST" action="{{ url_for('admin.skill_delete', sid=s.id) }}" onsubmit="return confirm('Delete?');" style="display:inline">
+            <button class="action-btn delete">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+{% block title %}JK Data Lab — AI & Data Science Freelancing{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="hero" id="hero">
+  <canvas id="particle-canvas"></canvas>
+  <div class="hero-content">
+    <div class="hero-badge">🌟 MSME Registered Business · Serving Global Clients</div>
+    <h1 class="hero-headline">
+      Transforming Raw Data Into<br>
+      <span class="gradient-text">Business Intelligence</span>
+    </h1>
+    <p class="hero-sub">AI · Data Science · NLP · RAG Solutions delivered by JK Data Lab</p>
+    <p class="hero-typing">Specializing in: <span id="typed-text" class="typed-accent"></span><span class="cursor">|</span></p>
+    <div class="hero-cta">
+      <a href="#portfolio" class="btn btn-primary">View Our Work</a>
+      <a href="https://calendly.com/kinjal-jkdatalab" target="_blank" rel="noopener" class="btn btn-outline">Book Free Consultation</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item"><span class="stat-num">50+</span><span class="stat-label">Projects</span></div>
+      <div class="stat-item"><span class="stat-num">30+</span><span class="stat-label">Clients</span></div>
+      <div class="stat-item"><span class="stat-num">10+</span><span class="stat-label">Countries</span></div>
+      <div class="stat-item"><span class="stat-num">5+</span><span class="stat-label">Years</span></div>
+    </div>
+  </div>
+  <div class="hero-hexagons">
+    <div class="hex hex-1"></div>
+    <div class="hex hex-2"></div>
+    <div class="hex hex-3"></div>
+  </div>
+  <a href="#services" class="scroll-down" aria-label="Scroll down">
+    <span class="scroll-arrow"></span>
+  </a>
+</section>
+
+<!-- Services Section -->
+<section class="section services-section" id="services">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">What We Do</span>
+      <h2 class="section-title">Our <span class="gradient-text">Services</span></h2>
+      <p class="section-sub">End-to-end AI and Data Science solutions tailored to your business goals</p>
+    </div>
+    <div class="services-grid">
+      {% for svc in services %}
+      <div class="service-card glass-card" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+        <div class="service-icon">{{ svc.title[:2] }}</div>
+        <h3 class="service-title">{{ svc.title[2:].strip() }}</h3>
+        <p class="service-desc">{{ svc.description }}</p>
+        <a href="{{ url_for('public.services') }}#{{ svc.slug }}" class="service-link">Learn More →</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Why Choose Us -->
+<section class="section why-section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">Why Us</span>
+      <h2 class="section-title">Why Choose <span class="gradient-text">JK Data Lab</span></h2>
+    </div>
+    <div class="why-grid">
+      <div class="why-card glass-card">
+        <div class="why-icon">⚡</div>
+        <h3>Fast Delivery</h3>
+        <p>On-time delivery with agile methodology and clear milestones for every project.</p>
+      </div>
+      <div class="why-card glass-card">
+        <div class="why-icon">🌍</div>
+        <h3>Global Clients</h3>
+        <p>Trusted by 30+ clients across 10+ countries — USA, UK, Canada, Australia and more.</p>
+      </div>
+      <div class="why-card glass-card">
+        <div class="why-icon">💎</div>
+        <h3>Quality Assured</h3>
+        <p>Rigorous testing, documentation, and code reviews ensure production-ready solutions.</p>
+      </div>
+      <div class="why-card glass-card">
+        <div class="why-icon">🔒</div>
+        <h3>NDA Protected</h3>
+        <p>Your data and intellectual property are always safe under strict NDAs.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Portfolio Section -->
+<section class="section portfolio-section" id="portfolio">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">Our Work</span>
+      <h2 class="section-title">Featured <span class="gradient-text">Projects</span></h2>
+      <p class="section-sub">Real solutions delivering real results for clients worldwide</p>
+    </div>
+    <div class="portfolio-filter">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="AI">AI</button>
+      <button class="filter-btn" data-filter="Data Science">Data Science</button>
+      <button class="filter-btn" data-filter="NLP">NLP</button>
+      <button class="filter-btn" data-filter="Dashboard">Dashboard</button>
+      <button class="filter-btn" data-filter="Automation">Automation</button>
+    </div>
+    <div class="portfolio-grid" id="portfolio-grid">
+      {% for project in projects %}
+      <div class="project-card glass-card" data-category="{{ project.category }}">
+        <div class="project-img">
+          {% if project.cover_image %}
+            <img src="{{ url_for('static', filename=project.cover_image) }}" alt="{{ project.title }}">
+          {% else %}
+            <div class="project-img-placeholder">
+              <span>{{ project.category }}</span>
+            </div>
+          {% endif %}
+          {% if project.featured %}<span class="badge-featured">Featured</span>{% endif %}
+        </div>
+        <div class="project-body">
+          <span class="project-category">{{ project.category }}</span>
+          <h3 class="project-title">{{ project.title }}</h3>
+          <p class="project-desc">{{ project.short_desc }}</p>
+          <div class="project-tags">
+            {% for tech in project.tech_list()[:4] %}
+              <span class="tag">{{ tech }}</span>
+            {% endfor %}
+          </div>
+          <a href="{{ url_for('public.portfolio_detail', slug=project.slug) }}" class="btn btn-sm btn-outline">View Details →</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="portfolio-cta">
+      <a href="{{ url_for('public.portfolio') }}" class="btn btn-primary">View All Projects</a>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="section testimonials-section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">Client Feedback</span>
+      <h2 class="section-title">What Clients <span class="gradient-text">Say</span></h2>
+    </div>
+    <div class="testimonials-slider" id="testimonials-slider">
+      <div class="testimonials-track" id="testimonials-track">
+        {% for t in testimonials %}
+        <div class="testimonial-card glass-card">
+          <div class="stars">{% for i in range(t.rating) %}★{% endfor %}</div>
+          <p class="testimonial-text">"{{ t.text }}"</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">{{ t.client_name[0] }}</div>
+            <div>
+              <strong>{{ t.client_name }}</strong>
+              <span>{{ t.company }}{% if t.country %}, {{ t.country }}{% endif %}</span>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="slider-controls">
+        <button class="slider-btn" id="prev-btn">&#8592;</button>
+        <div class="slider-dots" id="slider-dots"></div>
+        <button class="slider-btn" id="next-btn">&#8594;</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Section -->
+<section class="section stats-section">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-block">
+        <div class="stat-counter" data-target="50">0</div>
+        <span class="stat-suffix">+</span>
+        <p>Projects Completed</p>
+      </div>
+      <div class="stat-block">
+        <div class="stat-counter" data-target="30">0</div>
+        <span class="stat-suffix">+</span>
+        <p>Happy Clients</p>
+      </div>
+      <div class="stat-block">
+        <div class="stat-counter" data-target="10">0</div>
+        <span class="stat-suffix">+</span>
+        <p>Countries Served</p>
+      </div>
+      <div class="stat-block">
+        <div class="stat-counter" data-target="5">0</div>
+        <span class="stat-suffix">+</span>
+        <p>Years Experience</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact CTA -->
+<section class="section contact-cta-section" id="contact">
+  <div class="container">
+    <div class="cta-box glass-card">
+      <h2>Ready to Transform Your Data?</h2>
+      <p>Let's discuss your project and build something extraordinary together.</p>
+      <div class="cta-actions">
+        <a href="{{ url_for('public.contact') }}" class="btn btn-primary">Get In Touch</a>
+        <a href="https://wa.me/919157938887?text=Hi%20JK%20Data%20Lab%2C%20I%27m%20interested%20in%20your%20services" target="_blank" class="btn btn-outline">💬 WhatsApp Us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/particles.js') }}"></script>
+{% endblock %}

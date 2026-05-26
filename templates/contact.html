@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Contact Us — JK Data Lab{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    <h1 class="page-title">Get In <span class="gradient-text">Touch</span></h1>
+    <p class="page-sub">Let's discuss your project and build something incredible</p>
+  </div>
+</section>
+
+<section class="section contact-section">
+  <div class="container">
+    <div class="contact-grid">
+      <!-- Contact Form -->
+      <div class="contact-form-wrap glass-card">
+        <h2>Send a Message</h2>
+        <form action="{{ url_for('public.contact') }}" method="POST" class="contact-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">Full Name *</label>
+              <input type="text" id="name" name="name" required placeholder="John Smith">
+            </div>
+            <div class="form-group">
+              <label for="email">Email Address *</label>
+              <input type="email" id="email" name="email" required placeholder="john@company.com">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="company">Company / Organization</label>
+            <input type="text" id="company" name="company" placeholder="Your Company">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="service">Service Required</label>
+              <select id="service" name="service">
+                <option value="">Select a service</option>
+                <option>AI & Machine Learning</option>
+                <option>Data Science & Analytics</option>
+                <option>NLP Solutions</option>
+                <option>RAG Systems</option>
+                <option>Python Automation</option>
+                <option>Interactive Dashboards</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="budget">Budget Range</label>
+              <select id="budget" name="budget">
+                <option value="">Select budget</option>
+                <option>Under $500</option>
+                <option>$500 – $1,000</option>
+                <option>$1,000 – $5,000</option>
+                <option>$5,000 – $10,000</option>
+                <option>$10,000+</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="message">Your Message *</label>
+            <textarea id="message" name="message" rows="5" required placeholder="Describe your project requirements..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">Send Message →</button>
+        </form>
+      </div>
+
+      <!-- Contact Info -->
+      <div class="contact-info">
+        <div class="info-card glass-card">
+          <h3>Contact Information</h3>
+          <div class="info-item"><span class="info-icon">📧</span><div><strong>Email</strong><a href="mailto:kinjal@jkdatalab.com">kinjal@jkdatalab.com</a></div></div>
+          <div class="info-item"><span class="info-icon">📞</span><div><strong>Phone</strong><a href="tel:+919157938887">+91-9157938887</a></div></div>
+          <div class="info-item"><span class="info-icon">📍</span><div><strong>Location</strong><span>Ahmedabad, Gujarat, India</span></div></div>
+          <div class="info-item"><span class="info-icon">⏰</span><div><strong>Response Time</strong><span>Within 24 hours</span></div></div>
+        </div>
+        <div class="info-card glass-card">
+          <h3>Book a Free Call</h3>
+          <p>Schedule a 30-minute free consultation to discuss your project.</p>
+          <a href="https://calendly.com/kinjal-jkdatalab" target="_blank" class="btn btn-primary">Book on Calendly</a>
+        </div>
+        <div class="info-card glass-card">
+          <h3>Find Me On</h3>
+          <div class="platform-links">
+            <a href="#" class="platform-link">LinkedIn</a>
+            <a href="#" class="platform-link">GitHub</a>
+            <a href="#" class="platform-link">Upwork</a>
+            <a href="#" class="platform-link">Fiverr</a>
+          </div>
+        </div>
+        <div class="info-card glass-card">
+          <h3>📍 Our Location</h3>
+          <p>C 102 Aaron Elegance, New C.G. Road,<br>Chandkheda, Ahmedabad, Gujarat - 382424</p>
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3671.0!2d72.599!3d23.108!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjPCsDA2JzI4LjgiTiA3MsKwMzUnNTYuNCJF!5e0!3m2!1sen!2sin!4v1234567890"
+            width="100%" height="200" style="border:0;border-radius:8px;" allowfullscreen loading="lazy">
+          </iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

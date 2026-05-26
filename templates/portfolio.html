@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Portfolio — JK Data Lab{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    <h1 class="page-title">Our <span class="gradient-text">Portfolio</span></h1>
+    <p class="page-sub">{{ projects|length }} projects delivered for clients worldwide</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="portfolio-filter">
+      <a href="{{ url_for('public.portfolio') }}" class="filter-btn {% if not active_category %}active{% endif %}">All</a>
+      {% for cat in categories %}
+        <a href="{{ url_for('public.portfolio', category=cat) }}" class="filter-btn {% if active_category == cat %}active{% endif %}">{{ cat }}</a>
+      {% endfor %}
+    </div>
+
+    <div class="portfolio-grid">
+      {% for project in projects %}
+      <div class="project-card glass-card">
+        <div class="project-img">
+          {% if project.cover_image %}
+            <img src="{{ url_for('static', filename=project.cover_image) }}" alt="{{ project.title }}">
+          {% else %}
+            <div class="project-img-placeholder"><span>{{ project.category }}</span></div>
+          {% endif %}
+          {% if project.featured %}<span class="badge-featured">Featured</span>{% endif %}
+        </div>
+        <div class="project-body">
+          <span class="project-category">{{ project.category }}</span>
+          <h3 class="project-title">{{ project.title }}</h3>
+          <p class="project-desc">{{ project.short_desc }}</p>
+          <div class="project-tags">
+            {% for tech in project.tech_list()[:5] %}
+              <span class="tag">{{ tech }}</span>
+            {% endfor %}
+          </div>
+          <div class="project-meta">
+            {% if project.client_country %}<span class="project-country">🌍 {{ project.client_country }}</span>{% endif %}
+            <span class="project-views">👁 {{ project.views or 0 }}</span>
+          </div>
+          <a href="{{ url_for('public.portfolio_detail', slug=project.slug) }}" class="btn btn-sm btn-outline">View Details →</a>
+        </div>
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <p>No projects found in this category yet.</p>
+        <a href="{{ url_for('public.portfolio') }}" class="btn btn-outline">View All</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

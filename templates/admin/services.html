@@ -1,0 +1,23 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Services — Admin{% endblock %}
+
+{% block content %}
+<div class="page-header"><h1>Services</h1></div>
+<div class="table-card">
+  <table class="admin-table">
+    <thead>
+      <tr><th>Order</th><th>Title</th><th>Visible</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      {% for svc in services %}
+      <tr>
+        <td>{{ svc.order }}</td>
+        <td>{{ svc.title }}</td>
+        <td>{{ '✅' if svc.visible else '❌' }}</td>
+        <td><a href="{{ url_for('admin.service_edit', sid=svc.id) }}" class="action-btn edit">Edit</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

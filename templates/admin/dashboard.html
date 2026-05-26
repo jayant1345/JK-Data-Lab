@@ -1,0 +1,101 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Dashboard — JK Data Lab Admin{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Dashboard</h1>
+  <p>Welcome back, {{ current_user.username }}!</p>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon">🗂</div>
+    <div class="stat-info">
+      <span class="stat-num">{{ stats.projects }}</span>
+      <span class="stat-label">Projects</span>
+    </div>
+    <a href="{{ url_for('admin.projects') }}" class="stat-link">Manage →</a>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">⭐</div>
+    <div class="stat-info">
+      <span class="stat-num">{{ stats.testimonials }}</span>
+      <span class="stat-label">Testimonials</span>
+    </div>
+    <a href="{{ url_for('admin.testimonials') }}" class="stat-link">Manage →</a>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">💬</div>
+    <div class="stat-info">
+      <span class="stat-num">{{ stats.messages }}</span>
+      <span class="stat-label">Messages</span>
+    </div>
+    <a href="{{ url_for('admin.messages') }}" class="stat-link">View →</a>
+  </div>
+  <div class="stat-card {% if stats.unread > 0 %}stat-alert{% endif %}">
+    <div class="stat-icon">📬</div>
+    <div class="stat-info">
+      <span class="stat-num">{{ stats.unread }}</span>
+      <span class="stat-label">Unread</span>
+    </div>
+    <a href="{{ url_for('admin.messages', status='unread') }}" class="stat-link">Read →</a>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">✍️</div>
+    <div class="stat-info">
+      <span class="stat-num">{{ stats.blog_posts }}</span>
+      <span class="stat-label">Blog Posts</span>
+    </div>
+    <a href="{{ url_for('admin.blog') }}" class="stat-link">Manage →</a>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">⚙️</div>
+    <div class="stat-info">
+      <span class="stat-num">{{ stats.services }}</span>
+      <span class="stat-label">Services</span>
+    </div>
+    <a href="{{ url_for('admin.services') }}" class="stat-link">Edit →</a>
+  </div>
+</div>
+
+<div class="dashboard-grid">
+  <div class="dash-card">
+    <div class="dash-card-header">
+      <h3>Recent Messages</h3>
+      <a href="{{ url_for('admin.messages') }}" class="view-all">View All</a>
+    </div>
+    {% if recent_messages %}
+    <table class="admin-table">
+      <thead>
+        <tr><th>Name</th><th>Email</th><th>Service</th><th>Status</th><th>Date</th></tr>
+      </thead>
+      <tbody>
+        {% for msg in recent_messages %}
+        <tr class="{% if msg.status == 'unread' %}row-unread{% endif %}">
+          <td>{{ msg.name }}</td>
+          <td>{{ msg.email }}</td>
+          <td>{{ msg.service or '—' }}</td>
+          <td><span class="badge badge-{{ msg.status }}">{{ msg.status }}</span></td>
+          <td>{{ msg.created_at.strftime('%d %b') }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="empty-msg">No messages yet.</p>
+    {% endif %}
+  </div>
+
+  <div class="dash-card">
+    <h3>Quick Actions</h3>
+    <div class="quick-actions">
+      <a href="{{ url_for('admin.project_new') }}" class="quick-btn">+ New Project</a>
+      <a href="{{ url_for('admin.testimonial_new') }}" class="quick-btn">+ Testimonial</a>
+      <a href="{{ url_for('admin.blog_new') }}" class="quick-btn">+ Blog Post</a>
+      <a href="{{ url_for('admin.settings') }}" class="quick-btn">⚙ Settings</a>
+      <a href="{{ url_for('admin.export_db') }}" class="quick-btn">⬇ Export DB</a>
+      <a href="{{ url_for('admin.messages_export') }}" class="quick-btn">⬇ Export Messages</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

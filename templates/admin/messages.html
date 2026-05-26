@@ -1,0 +1,75 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Messages — Admin{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Contact Messages</h1>
+  <div>
+    <a href="{{ url_for('admin.messages_export') }}" class="btn-admin-secondary">⬇ Export CSV</a>
+  </div>
+</div>
+<div class="admin-toolbar">
+  <div class="filter-tabs">
+    <a href="{{ url_for('admin.messages') }}" class="filter-tab {% if not status_filter %}active{% endif %}">All</a>
+    <a href="{{ url_for('admin.messages', status='unread') }}" class="filter-tab {% if status_filter == 'unread' %}active{% endif %}">Unread</a>
+    <a href="{{ url_for('admin.messages', status='read') }}" class="filter-tab {% if status_filter == 'read' %}active{% endif %}">Read</a>
+    <a href="{{ url_for('admin.messages', status='replied') }}" class="filter-tab {% if status_filter == 'replied' %}active{% endif %}">Replied</a>
+  </div>
+</div>
+<div class="table-card">
+  <table class="admin-table">
+    <thead>
+      <tr><th>Name</th><th>Email</th><th>Company</th><th>Service</th><th>Budget</th><th>Status</th><th>Date</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      {% for msg in messages.items %}
+      <tr class="{% if msg.status == 'unread' %}row-unread{% endif %}">
+        <td><strong>{{ msg.name }}</strong></td>
+        <td><a href="mailto:{{ msg.email }}">{{ msg.email }}</a></td>
+        <td>{{ msg.company or '—' }}</td>
+        <td>{{ msg.service or '—' }}</td>
+        <td>{{ msg.budget or '—' }}</td>
+        <td>
+          <form method="POST" action="{{ url_for('admin.message_status', mid=msg.id) }}" style="display:inline">
+            <select name="status" onchange="this.form.submit()" class="status-select">
+              {% for s in ['unread', 'read', 'replied'] %}
+                <option value="{{ s }}" {{ 'selected' if msg.status == s }}>{{ s }}</option>
+              {% endfor %}
+            </select>
+          </form>
+        </td>
+        <td>{{ msg.created_at.strftime('%d %b %Y') }}</td>
+        <td class="actions">
+          <button onclick="showMessage('{{ msg.name|e }}','{{ msg.message|e }}')" class="action-btn edit">View</button>
+          <form method="POST" action="{{ url_for('admin.message_delete', mid=msg.id) }}" onsubmit="return confirm('Delete?');" style="display:inline">
+            <button class="action-btn delete">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="8" class="empty-msg">No messages.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% set projects = none %}{% set testimonials = none %}{% set posts = none %}{% include "admin/_pagination.html" with context %}
+</div>
+
+<!-- Message Modal -->
+<div id="msg-modal" class="modal" style="display:none">
+  <div class="modal-content">
+    <h3 id="modal-name"></h3>
+    <p id="modal-text"></p>
+    <button onclick="document.getElementById('msg-modal').style.display='none'" class="btn-admin-secondary">Close</button>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showMessage(name, text) {
+  document.getElementById('modal-name').textContent = name;
+  document.getElementById('modal-text').textContent = text;
+  document.getElementById('msg-modal').style.display = 'flex';
+}
+</script>
+{% endblock %}

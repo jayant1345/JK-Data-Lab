@@ -1,0 +1,41 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Blog — Admin{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Blog Posts</h1>
+  <a href="{{ url_for('admin.blog_new') }}" class="btn-admin-primary">+ New Post</a>
+</div>
+<div class="admin-toolbar">
+  <form method="GET" class="search-form">
+    <input type="text" name="q" value="{{ search }}" placeholder="Search posts…" class="admin-search">
+    <button type="submit" class="btn-admin-secondary">Search</button>
+  </form>
+</div>
+<div class="table-card">
+  <table class="admin-table">
+    <thead>
+      <tr><th>Title</th><th>Category</th><th>Status</th><th>Date</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      {% for post in posts.items %}
+      <tr>
+        <td>{{ post.title }}</td>
+        <td>{{ post.category or '—' }}</td>
+        <td><span class="badge badge-{{ post.status }}">{{ post.status }}</span></td>
+        <td>{{ post.created_at.strftime('%d %b %Y') }}</td>
+        <td class="actions">
+          <a href="{{ url_for('admin.blog_edit', bid=post.id) }}" class="action-btn edit">Edit</a>
+          <form method="POST" action="{{ url_for('admin.blog_delete', bid=post.id) }}" onsubmit="return confirm('Delete?');" style="display:inline">
+            <button class="action-btn delete">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" class="empty-msg">No blog posts yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% set projects = none %}{% set testimonials = none %}{% include "admin/_pagination.html" with context %}
+</div>
+{% endblock %}

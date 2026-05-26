@@ -1,0 +1,36 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Testimonials — Admin{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Testimonials</h1>
+  <a href="{{ url_for('admin.testimonial_new') }}" class="btn-admin-primary">+ Add Testimonial</a>
+</div>
+<div class="table-card">
+  <table class="admin-table">
+    <thead>
+      <tr><th>Client</th><th>Company</th><th>Country</th><th>Rating</th><th>Visible</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      {% for t in testimonials.items %}
+      <tr>
+        <td>{{ t.client_name }}</td>
+        <td>{{ t.company or '—' }}</td>
+        <td>{{ t.country or '—' }}</td>
+        <td>{% for i in range(t.rating) %}★{% endfor %}</td>
+        <td>{{ '✅' if t.visible else '❌' }}</td>
+        <td class="actions">
+          <a href="{{ url_for('admin.testimonial_edit', tid=t.id) }}" class="action-btn edit">Edit</a>
+          <form method="POST" action="{{ url_for('admin.testimonial_delete', tid=t.id) }}" onsubmit="return confirm('Delete?');" style="display:inline">
+            <button class="action-btn delete">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="empty-msg">No testimonials yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% set projects = none %}{% include "admin/_pagination.html" with context %}
+</div>
+{% endblock %}

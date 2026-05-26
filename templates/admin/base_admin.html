@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Admin — JK Data Lab{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="admin-body">
+
+<div class="admin-layout">
+  <!-- Sidebar -->
+  <aside class="admin-sidebar" id="admin-sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-text">JK <span class="brand-accent">Admin</span></span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="{{ url_for('admin.dashboard') }}" class="nav-item {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+      <a href="{{ url_for('admin.projects') }}" class="nav-item {% if 'project' in request.endpoint %}active{% endif %}">
+        <span class="nav-icon">🗂</span> Projects
+      </a>
+      <a href="{{ url_for('admin.services') }}" class="nav-item {% if 'service' in request.endpoint %}active{% endif %}">
+        <span class="nav-icon">⚙️</span> Services
+      </a>
+      <a href="{{ url_for('admin.testimonials') }}" class="nav-item {% if 'testimonial' in request.endpoint %}active{% endif %}">
+        <span class="nav-icon">⭐</span> Testimonials
+      </a>
+      <a href="{{ url_for('admin.blog') }}" class="nav-item {% if 'blog' in request.endpoint %}active{% endif %}">
+        <span class="nav-icon">✍️</span> Blog
+      </a>
+      <a href="{{ url_for('admin.messages') }}" class="nav-item {% if 'message' in request.endpoint %}active{% endif %}">
+        <span class="nav-icon">💬</span> Messages
+      </a>
+      <a href="{{ url_for('admin.skills') }}" class="nav-item {% if 'skill' in request.endpoint %}active{% endif %}">
+        <span class="nav-icon">💡</span> Skills
+      </a>
+      <a href="{{ url_for('admin.settings') }}" class="nav-item {% if 'settings' in request.endpoint %}active{% endif %}">
+        <span class="nav-icon">🔧</span> Settings
+      </a>
+      <div class="nav-divider"></div>
+      <a href="{{ url_for('public.index') }}" class="nav-item" target="_blank">
+        <span class="nav-icon">🌐</span> View Site
+      </a>
+      <a href="{{ url_for('admin.logout') }}" class="nav-item nav-logout">
+        <span class="nav-icon">🚪</span> Logout
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="admin-main">
+    <header class="admin-header">
+      <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+      <div class="admin-header-right">
+        <span class="admin-user">👤 {{ current_user.username }}</span>
+      </div>
+    </header>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="admin-flash-container">
+          {% for category, message in messages %}
+            <div class="admin-flash admin-flash-{{ category }}">
+              {{ message }}
+              <button onclick="this.parentElement.remove()">&times;</button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="admin-content">
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,45 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Projects — Admin{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Projects</h1>
+  <a href="{{ url_for('admin.project_new') }}" class="btn-admin-primary">+ Add Project</a>
+</div>
+
+<div class="admin-toolbar">
+  <form method="GET" class="search-form">
+    <input type="text" name="q" value="{{ search }}" placeholder="Search projects…" class="admin-search">
+    <button type="submit" class="btn-admin-secondary">Search</button>
+    {% if search %}<a href="{{ url_for('admin.projects') }}" class="btn-admin-secondary">Clear</a>{% endif %}
+  </form>
+</div>
+
+<div class="table-card">
+  <table class="admin-table">
+    <thead>
+      <tr><th>Title</th><th>Category</th><th>Status</th><th>Featured</th><th>Views</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      {% for proj in projects.items %}
+      <tr>
+        <td><strong>{{ proj.title }}</strong><br><small>{{ proj.short_desc[:60] }}…</small></td>
+        <td>{{ proj.category }}</td>
+        <td><span class="badge badge-{{ proj.status }}">{{ proj.status }}</span></td>
+        <td>{{ '★' if proj.featured else '—' }}</td>
+        <td>{{ proj.views }}</td>
+        <td class="actions">
+          <a href="{{ url_for('admin.project_edit', pid=proj.id) }}" class="action-btn edit">Edit</a>
+          <form method="POST" action="{{ url_for('admin.project_delete', pid=proj.id) }}" onsubmit="return confirm('Delete this project?');" style="display:inline">
+            <button class="action-btn delete">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="empty-msg">No projects found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% include "admin/_pagination.html" with context %}
+</div>
+{% endblock %}

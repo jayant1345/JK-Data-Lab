@@ -1,0 +1,104 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}{{ 'Edit' if project else 'New' }} Project — Admin{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>{{ 'Edit' if project else 'New' }} Project</h1>
+  <a href="{{ url_for('admin.projects') }}" class="btn-admin-secondary">← Back</a>
+</div>
+
+<form method="POST" enctype="multipart/form-data" class="admin-form">
+  <div class="form-grid">
+    <div class="form-col-main">
+      <div class="form-card">
+        <div class="form-group">
+          <label>Title *</label>
+          <input type="text" name="title" value="{{ project.title if project else '' }}" required>
+        </div>
+        <div class="form-group">
+          <label>Short Description</label>
+          <input type="text" name="short_desc" value="{{ project.short_desc if project else '' }}" maxlength="300">
+        </div>
+        <div class="form-group">
+          <label>Full Description</label>
+          <div id="quill-editor" style="height:300px">{{ project.full_desc | safe if project and project.full_desc else '' }}</div>
+          <input type="hidden" name="full_desc" id="full_desc">
+        </div>
+        <div class="form-group">
+          <label>Results / Impact</label>
+          <textarea name="results" rows="3">{{ project.results if project else '' }}</textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-col-side">
+      <div class="form-card">
+        <div class="form-group">
+          <label>Category *</label>
+          <select name="category">
+            {% for cat in ['AI', 'Data Science', 'NLP', 'Dashboard', 'Automation', 'RAG'] %}
+              <option value="{{ cat }}" {{ 'selected' if project and project.category == cat else '' }}>{{ cat }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select name="status">
+            <option value="published" {{ 'selected' if not project or project.status == 'published' else '' }}>Published</option>
+            <option value="draft" {{ 'selected' if project and project.status == 'draft' else '' }}>Draft</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label><input type="checkbox" name="featured" {{ 'checked' if project and project.featured else '' }}> Featured</label>
+        </div>
+        <div class="form-group">
+          <label>Tech Stack (comma-separated)</label>
+          <input type="text" name="tech_stack" value="{{ project.tech_stack if project else '' }}" placeholder="Python, Flask, Pandas">
+        </div>
+        <div class="form-group">
+          <label>Client Name</label>
+          <input type="text" name="client_name" value="{{ project.client_name if project else '' }}">
+        </div>
+        <div class="form-group">
+          <label>Client Country</label>
+          <input type="text" name="client_country" value="{{ project.client_country if project else '' }}">
+        </div>
+        <div class="form-group">
+          <label>Project Date</label>
+          <input type="date" name="project_date" value="{{ project.project_date.isoformat() if project and project.project_date else '' }}">
+        </div>
+        <div class="form-group">
+          <label>GitHub URL</label>
+          <input type="url" name="github_url" value="{{ project.github_url if project else '' }}">
+        </div>
+        <div class="form-group">
+          <label>Live URL</label>
+          <input type="url" name="live_url" value="{{ project.live_url if project else '' }}">
+        </div>
+        <div class="form-group">
+          <label>Cover Image (max 5MB)</label>
+          {% if project and project.cover_image %}
+            <img src="{{ url_for('static', filename=project.cover_image) }}" alt="Current cover" class="img-preview">
+          {% endif %}
+          <input type="file" name="cover_image" accept="image/*">
+        </div>
+      </div>
+      <button type="submit" class="btn-admin-primary btn-full">{{ 'Update' if project else 'Create' }} Project</button>
+    </div>
+  </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+<script>
+  var quill = new Quill('#quill-editor', { theme: 'snow' });
+  document.querySelector('form').addEventListener('submit', function() {
+    document.getElementById('full_desc').value = quill.root.innerHTML;
+  });
+</script>
+{% endblock %}
