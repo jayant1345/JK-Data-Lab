@@ -50,6 +50,11 @@ def create_app(env=None):
     os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'testimonials'), exist_ok=True)
     os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'blog'), exist_ok=True)
 
+    with app.app_context():
+        db.create_all()
+        from utils.seed_data import seed_all
+        seed_all(app)
+
     return app
 
 
