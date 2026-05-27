@@ -16,6 +16,7 @@ class Config:
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
+    MAIL_TIMEOUT = 10  # fail fast if SMTP hangs
     CONTACT_RECEIVER = os.environ.get('CONTACT_RECEIVER', 'kinjal@jkdatalab.com')
 
     ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
