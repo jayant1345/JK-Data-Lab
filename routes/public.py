@@ -1,6 +1,6 @@
+import threading
 from datetime import datetime, timedelta
 from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify, abort
-from flask_mail import Mail
 from models import db, Project, Service, Testimonial, BlogPost, ContactMessage, SiteSetting, Skill
 from utils.helpers import get_site_settings
 
@@ -110,12 +110,17 @@ def contact():
 
         _contact_log.setdefault(ip, []).append(datetime.utcnow())
 
-        # Send email (non-blocking fail)
+        # Send email in background thread so SMTP timeout never blocks the response
         from flask import current_app
         from utils.email import send_contact_email
         mail = current_app.extensions.get('mail')
         if mail:
-            send_contact_email(mail, request.form)
+            app_obj = current_app._get_current_object()
+            form_data = dict(request.form)
+            def _send_email():
+                with app_obj.app_context():
+                    send_contact_email(mail, form_data)
+            threading.Thread(target=_send_email, daemon=True).start()
 
         flash('Thank you! Your message has been sent. We will respond within 24 hours.', 'success')
         return redirect(url_for('public.contact'))
