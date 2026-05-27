@@ -440,6 +440,50 @@ def skill_delete(sid):
     return redirect(url_for('admin.skills'))
 
 
+# ── Test Email ────────────────────────────────────────────────────────────────
+
+@admin_bp.route('/test-email')
+@login_required
+def test_email():
+    from flask_mail import Message as MailMessage
+    cfg = current_app.config
+    diagnostics = {
+        'MAIL_SERVER': cfg.get('MAIL_SERVER'),
+        'MAIL_PORT': cfg.get('MAIL_PORT'),
+        'MAIL_USE_TLS': cfg.get('MAIL_USE_TLS'),
+        'MAIL_USERNAME': cfg.get('MAIL_USERNAME'),
+        'MAIL_PASSWORD': '***' if cfg.get('MAIL_PASSWORD') else 'NOT SET',
+        'MAIL_DEFAULT_SENDER': cfg.get('MAIL_DEFAULT_SENDER'),
+        'CONTACT_RECEIVER': cfg.get('CONTACT_RECEIVER'),
+    }
+    result = 'Not attempted'
+    try:
+        mail = current_app.extensions.get('mail')
+        if not mail:
+            result = 'ERROR: Mail extension not initialized'
+        elif not cfg.get('MAIL_PASSWORD'):
+            result = 'ERROR: MAIL_PASSWORD is not set in Railway Variables'
+        elif not cfg.get('MAIL_USERNAME'):
+            result = 'ERROR: MAIL_USERNAME is not set in Railway Variables'
+        else:
+            msg = MailMessage(
+                subject='JK Data Lab — Test Email',
+                recipients=[cfg.get('CONTACT_RECEIVER', 'kinjal@jkdatalab.com')],
+                body='This is a test email from JK Data Lab admin panel.',
+                sender=cfg.get('MAIL_DEFAULT_SENDER') or cfg.get('MAIL_USERNAME'),
+            )
+            mail.send(msg)
+            result = f"SUCCESS: Email sent to {cfg.get('CONTACT_RECEIVER')}"
+    except Exception as e:
+        result = f'ERROR: {e}'
+
+    lines = [f'<h2>Email Test Result</h2><p><strong>{result}</strong></p><h3>Config:</h3><ul>']
+    for k, v in diagnostics.items():
+        lines.append(f'<li><b>{k}:</b> {v}</li>')
+    lines.append('</ul><p><a href="/admin/settings">← Back to Settings</a></p>')
+    return ''.join(lines)
+
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def _parse_date(val):
