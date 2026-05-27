@@ -40,7 +40,10 @@
         </td>
         <td>{{ msg.created_at.strftime('%d %b %Y') }}</td>
         <td class="actions">
-          <button onclick="showMessage({{ msg.name|tojson }}, {{ msg.email|tojson }}, {{ msg.message|tojson }})" class="action-btn edit">View</button>
+          <button class="action-btn edit view-btn"
+                  data-name="{{ msg.name }}"
+                  data-email="{{ msg.email }}"
+                  data-message="{{ msg.message }}">View</button>
           <form method="POST" action="{{ url_for('admin.message_delete', mid=msg.id) }}" onsubmit="return confirm('Delete?');" style="display:inline">
             <button class="action-btn delete">Delete</button>
           </form>
@@ -55,23 +58,31 @@
 </div>
 
 <!-- Message Modal -->
-<div id="msg-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;">
-  <div style="background:#1a1a2e;border:1px solid #333;border-radius:12px;padding:2rem;max-width:520px;width:90%;position:relative;">
-    <h3 id="modal-name" style="color:#00ffcc;margin-bottom:0.5rem;"></h3>
-    <p id="modal-email" style="color:#aaa;font-size:0.9rem;margin-bottom:1rem;"></p>
-    <p id="modal-text" style="color:#fff;white-space:pre-wrap;line-height:1.6;"></p>
-    <button onclick="document.getElementById('msg-modal').style.display='none'" class="btn-admin-secondary" style="margin-top:1rem;">Close</button>
+<div id="msg-modal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <h3 id="modal-name"></h3>
+    <p id="modal-email" style="font-size:0.85rem;margin-bottom:0.5rem;"></p>
+    <p id="modal-text"></p>
+    <button id="modal-close" class="btn-admin-secondary" style="margin-top:1rem;">Close</button>
   </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-function showMessage(name, email, text) {
-  document.getElementById('modal-name').textContent = name;
-  document.getElementById('modal-email').textContent = email;
-  document.getElementById('modal-text').textContent = text;
-  document.getElementById('msg-modal').style.display = 'flex';
-}
+document.querySelectorAll('.view-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.getElementById('modal-name').textContent = this.dataset.name;
+    document.getElementById('modal-email').textContent = this.dataset.email;
+    document.getElementById('modal-text').textContent = this.dataset.message;
+    document.getElementById('msg-modal').style.display = 'flex';
+  });
+});
+document.getElementById('modal-close').addEventListener('click', function() {
+  document.getElementById('msg-modal').style.display = 'none';
+});
+document.getElementById('msg-modal').addEventListener('click', function(e) {
+  if (e.target === this) this.style.display = 'none';
+});
 </script>
 {% endblock %}
