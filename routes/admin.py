@@ -445,67 +445,43 @@ def skill_delete(sid):
 @admin_bp.route('/test-email')
 @login_required
 def test_email():
-    import smtplib
-    import socket
+    import resend as resend_lib
     from flask import Response as FlaskResponse
     cfg = current_app.config
 
-    server   = cfg.get('MAIL_SERVER', 'smtp.zoho.in')
-    port     = cfg.get('MAIL_PORT', 465)
-    use_ssl  = cfg.get('MAIL_USE_SSL', True)
-    username = cfg.get('MAIL_USERNAME') or ''
-    password = cfg.get('MAIL_PASSWORD') or ''
-    sender   = cfg.get('MAIL_DEFAULT_SENDER') or username
+    api_key  = cfg.get('RESEND_API_KEY') or ''
+    sender   = cfg.get('MAIL_DEFAULT_SENDER', 'kinjal@jkdatalab.com')
     receiver = cfg.get('CONTACT_RECEIVER', 'kinjal@jkdatalab.com')
-    mode     = 'SSL (port 465)' if use_ssl else 'STARTTLS (port 587)'
 
     diag_rows = (
-        f"<tr><td>MAIL_SERVER</td><td>{server}</td></tr>"
-        f"<tr><td>MAIL_PORT</td><td>{port} ({mode})</td></tr>"
-        f"<tr><td>MAIL_USERNAME</td><td>{username or '<b style=color:red>NOT SET</b>'}</td></tr>"
-        f"<tr><td>MAIL_PASSWORD</td><td>{'*** (set)' if password else '<b style=color:red>NOT SET</b>'}</td></tr>"
-        f"<tr><td>MAIL_DEFAULT_SENDER</td><td>{sender or '<b style=color:red>NOT SET</b>'}</td></tr>"
+        f"<tr><td>RESEND_API_KEY</td><td>{'*** (set)' if api_key else '<b style=color:red>NOT SET — add in Railway Variables</b>'}</td></tr>"
+        f"<tr><td>MAIL_DEFAULT_SENDER</td><td>{sender}</td></tr>"
         f"<tr><td>CONTACT_RECEIVER</td><td>{receiver}</td></tr>"
     )
 
     result = ''
     color  = 'green'
 
-    if not username or not password:
-        result = 'MAIL_USERNAME or MAIL_PASSWORD is missing in Railway Variables.'
+    if not api_key:
+        result = 'RESEND_API_KEY is not set. Add it in Railway → Variables.'
         color  = 'red'
     else:
         try:
-            socket.setdefaulttimeout(10)
-            if use_ssl:
-                smtp = smtplib.SMTP_SSL(server, port, timeout=10)
-            else:
-                smtp = smtplib.SMTP(server, port, timeout=10)
-                smtp.ehlo()
-                smtp.starttls()
-            smtp.login(username, password)
-            body  = f"Subject: JK Data Lab Test Email\nFrom: {sender}\nTo: {receiver}\n\nThis is a test from JK Data Lab admin panel."
-            smtp.sendmail(sender, [receiver], body)
-            smtp.quit()
-            result = f'SUCCESS — email sent to {receiver}. Check your inbox (and spam).'
+            resend_lib.api_key = api_key
+            resend_lib.Emails.send({
+                "from": f"JK Data Lab <{sender}>",
+                "to": [receiver],
+                "subject": "JK Data Lab — Test Email",
+                "text": "This is a test email from the JK Data Lab admin panel.",
+            })
+            result = f'SUCCESS — email sent to {receiver}. Check your inbox (and spam folder).'
             color  = 'green'
-        except smtplib.SMTPAuthenticationError as e:
-            result = f'AUTH FAILED — wrong username or app password. Detail: {e}'
-            color  = 'red'
-        except smtplib.SMTPException as e:
-            result = f'SMTP ERROR — {e}'
-            color  = 'red'
-        except socket.timeout:
-            result = f'TIMEOUT — cannot reach {server}:{port} from Railway. Try the other port.'
-            color  = 'red'
         except Exception as e:
             result = f'ERROR — {type(e).__name__}: {e}'
             color  = 'red'
-        finally:
-            socket.setdefaulttimeout(None)
 
     html = f"""<!DOCTYPE html><html><body style="font-family:sans-serif;padding:2rem;">
-<h2>Email Diagnostics</h2>
+<h2>Email Diagnostics (Resend API)</h2>
 <table border="1" cellpadding="6" style="border-collapse:collapse;margin-bottom:1.5rem;">
 <tr><th>Setting</th><th>Value</th></tr>{diag_rows}</table>
 <h3 style="color:{color}">Result: {result}</h3>

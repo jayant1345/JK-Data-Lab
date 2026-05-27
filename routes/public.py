@@ -110,17 +110,15 @@ def contact():
 
         _contact_log.setdefault(ip, []).append(datetime.utcnow())
 
-        # Send email in background thread so SMTP timeout never blocks the response
+        # Send email via Resend API in background thread
         from flask import current_app
         from utils.email import send_contact_email
-        mail = current_app.extensions.get('mail')
-        if mail:
-            app_obj = current_app._get_current_object()
-            form_data = dict(request.form)
-            def _send_email():
-                with app_obj.app_context():
-                    send_contact_email(mail, form_data)
-            threading.Thread(target=_send_email, daemon=True).start()
+        app_obj = current_app._get_current_object()
+        form_data = dict(request.form)
+        def _send_email():
+            with app_obj.app_context():
+                send_contact_email(form_data)
+        threading.Thread(target=_send_email, daemon=True).start()
 
         flash('Thank you! Your message has been sent. We will respond within 24 hours.', 'success')
         return redirect(url_for('public.contact'))

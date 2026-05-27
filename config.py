@@ -10,14 +10,8 @@ class Config:
     SQLALCHEMY_DATABASE_URI = db_url.replace('postgres://', 'postgresql://', 1) if db_url.startswith('postgres://') else db_url
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.zoho.in')
-    MAIL_PORT = int(os.environ.get('MAIL_PORT', 465))
-    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'False') == 'True'
-    MAIL_USE_SSL = os.environ.get('MAIL_USE_SSL', 'True') == 'True'
-    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
-    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
-    MAIL_TIMEOUT = 10  # fail fast if SMTP hangs
+    RESEND_API_KEY = os.environ.get('RESEND_API_KEY')
+    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER', 'kinjal@jkdatalab.com')
     CONTACT_RECEIVER = os.environ.get('CONTACT_RECEIVER', 'kinjal@jkdatalab.com')
 
     ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
