@@ -451,15 +451,17 @@ def test_email():
     cfg = current_app.config
 
     server   = cfg.get('MAIL_SERVER', 'smtp.zoho.in')
-    port     = cfg.get('MAIL_PORT', 587)
+    port     = cfg.get('MAIL_PORT', 465)
+    use_ssl  = cfg.get('MAIL_USE_SSL', True)
     username = cfg.get('MAIL_USERNAME') or ''
     password = cfg.get('MAIL_PASSWORD') or ''
     sender   = cfg.get('MAIL_DEFAULT_SENDER') or username
     receiver = cfg.get('CONTACT_RECEIVER', 'kinjal@jkdatalab.com')
+    mode     = 'SSL (port 465)' if use_ssl else 'STARTTLS (port 587)'
 
     diag_rows = (
         f"<tr><td>MAIL_SERVER</td><td>{server}</td></tr>"
-        f"<tr><td>MAIL_PORT</td><td>{port}</td></tr>"
+        f"<tr><td>MAIL_PORT</td><td>{port} ({mode})</td></tr>"
         f"<tr><td>MAIL_USERNAME</td><td>{username or '<b style=color:red>NOT SET</b>'}</td></tr>"
         f"<tr><td>MAIL_PASSWORD</td><td>{'*** (set)' if password else '<b style=color:red>NOT SET</b>'}</td></tr>"
         f"<tr><td>MAIL_DEFAULT_SENDER</td><td>{sender or '<b style=color:red>NOT SET</b>'}</td></tr>"
@@ -475,9 +477,12 @@ def test_email():
     else:
         try:
             socket.setdefaulttimeout(10)
-            smtp = smtplib.SMTP(server, port, timeout=10)
-            smtp.ehlo()
-            smtp.starttls()
+            if use_ssl:
+                smtp = smtplib.SMTP_SSL(server, port, timeout=10)
+            else:
+                smtp = smtplib.SMTP(server, port, timeout=10)
+                smtp.ehlo()
+                smtp.starttls()
             smtp.login(username, password)
             body  = f"Subject: JK Data Lab Test Email\nFrom: {sender}\nTo: {receiver}\n\nThis is a test from JK Data Lab admin panel."
             smtp.sendmail(sender, [receiver], body)
@@ -491,7 +496,7 @@ def test_email():
             result = f'SMTP ERROR — {e}'
             color  = 'red'
         except socket.timeout:
-            result = f'TIMEOUT — cannot reach {server}:{port} from Railway (port may be blocked).'
+            result = f'TIMEOUT — cannot reach {server}:{port} from Railway. Try the other port.'
             color  = 'red'
         except Exception as e:
             result = f'ERROR — {type(e).__name__}: {e}'
