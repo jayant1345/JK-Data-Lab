@@ -17,6 +17,11 @@
         <h2>Send a Message</h2>
         <form action="{{ url_for('public.contact') }}" method="POST" class="contact-form">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+          <input type="hidden" name="ts" value="{{ form_ts }}">
+          <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">
+            <label for="website">Website</label>
+            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+          </div>
           <div class="form-row">
             <div class="form-group">
               <label for="name">Full Name *</label>

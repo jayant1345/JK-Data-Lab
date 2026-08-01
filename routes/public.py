@@ -1,3 +1,4 @@
+import time
 import threading
 from datetime import datetime, timedelta
 from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify, abort
@@ -8,6 +9,10 @@ public_bp = Blueprint('public', __name__)
 
 # Simple in-memory rate limiter: ip -> list of timestamps
 _contact_log = {}
+# Same-name cooldown to catch bots that rotate IP/email but reuse a name
+_name_log = {}
+
+MIN_FILL_SECONDS = 3
 
 
 def _rate_limited(ip):
@@ -16,6 +21,16 @@ def _rate_limited(ip):
     times = [t for t in _contact_log.get(ip, []) if t > window]
     _contact_log[ip] = times
     return len(times) >= 3
+
+
+def _name_rate_limited(name):
+    now = datetime.utcnow()
+    key = name.strip().lower()
+    last = _name_log.get(key)
+    if last and now - last < timedelta(minutes=30):
+        return True
+    _name_log[key] = now
+    return False
 
 
 @public_bp.route('/')
@@ -84,6 +99,24 @@ def contact():
     settings = get_site_settings()
     if request.method == 'POST':
         ip = request.remote_addr
+
+        # Honeypot: hidden field real users never fill in. Bots that
+        # blindly fill every input trip this. Pretend success so the
+        # bot doesn't learn to skip the field.
+        if request.form.get('website', '').strip():
+            flash('Thank you! Your message has been sent. We will respond within 24 hours.', 'success')
+            return redirect(url_for('public.contact'))
+
+        # Timing trap: form was rendered with a timestamp; a real human
+        # takes more than a few seconds to fill it in.
+        try:
+            rendered_at = int(request.form.get('ts', '0'))
+        except ValueError:
+            rendered_at = 0
+        if rendered_at and (time.time() - rendered_at) < MIN_FILL_SECONDS:
+            flash('Thank you! Your message has been sent. We will respond within 24 hours.', 'success')
+            return redirect(url_for('public.contact'))
+
         if _rate_limited(ip):
             flash('Too many submissions. Please wait an hour before trying again.', 'error')
             return redirect(url_for('public.contact'))
@@ -94,6 +127,10 @@ def contact():
 
         if not name or not email or not message:
             flash('Please fill in all required fields.', 'error')
+            return redirect(url_for('public.contact'))
+
+        if _name_rate_limited(name):
+            flash('Thank you! Your message has been sent. We will respond within 24 hours.', 'success')
             return redirect(url_for('public.contact'))
 
         msg = ContactMessage(
@@ -123,7 +160,7 @@ def contact():
         flash('Thank you! Your message has been sent. We will respond within 24 hours.', 'success')
         return redirect(url_for('public.contact'))
 
-    return render_template('contact.html', settings=settings)
+    return render_template('contact.html', settings=settings, form_ts=int(time.time()))
 
 
 @public_bp.route('/robots.txt')
