@@ -1,7 +1,8 @@
 import time
 import threading
+import requests
 from datetime import datetime, timedelta
-from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify, abort
+from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify, abort, current_app
 from models import db, Project, Service, Testimonial, BlogPost, ContactMessage, SiteSetting, Skill
 from utils.helpers import get_site_settings
 
@@ -31,6 +32,27 @@ def _name_rate_limited(name):
         ContactMessage.created_at > window,
     ).count()
     return count >= 1
+
+
+def _hcaptcha_valid(token, ip):
+    secret = current_app.config.get('HCAPTCHA_SECRET_KEY')
+    if not secret:
+        # Not configured yet — don't block submissions while keys are
+        # being set up, but this means hCaptcha isn't actually enforced.
+        current_app.logger.warning("HCAPTCHA_SECRET_KEY not set — captcha check skipped")
+        return True
+    if not token:
+        return False
+    try:
+        resp = requests.post(
+            'https://api.hcaptcha.com/siteverify',
+            data={'secret': secret, 'response': token, 'remoteip': ip},
+            timeout=5,
+        )
+        return resp.json().get('success', False)
+    except requests.RequestException as e:
+        current_app.logger.error(f"hCaptcha verification request failed: {e}")
+        return False
 
 
 @public_bp.route('/')
@@ -120,6 +142,10 @@ def contact():
             flash('Thank you! Your message has been sent. We will respond within 24 hours.', 'success')
             return redirect(url_for('public.contact'))
 
+        if not _hcaptcha_valid(request.form.get('h-captcha-response', ''), ip):
+            flash('Please complete the CAPTCHA verification and try again.', 'error')
+            return redirect(url_for('public.contact'))
+
         if _rate_limited(ip):
             flash('Too many submissions. Please wait an hour before trying again.', 'error')
             return redirect(url_for('public.contact'))
@@ -161,7 +187,12 @@ def contact():
         flash('Thank you! Your message has been sent. We will respond within 24 hours.', 'success')
         return redirect(url_for('public.contact'))
 
-    return render_template('contact.html', settings=settings, form_ts=int(time.time()))
+    return render_template(
+        'contact.html',
+        settings=settings,
+        form_ts=int(time.time()),
+        hcaptcha_site_key=current_app.config.get('HCAPTCHA_SITE_KEY'),
+    )
 
 
 @public_bp.route('/robots.txt')

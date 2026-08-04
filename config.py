@@ -10,6 +10,9 @@ class Config:
     SQLALCHEMY_DATABASE_URI = db_url.replace('postgres://', 'postgresql://', 1) if db_url.startswith('postgres://') else db_url
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    HCAPTCHA_SITE_KEY = os.environ.get('HCAPTCHA_SITE_KEY')
+    HCAPTCHA_SECRET_KEY = os.environ.get('HCAPTCHA_SECRET_KEY')
+
     RESEND_API_KEY = os.environ.get('RESEND_API_KEY')
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER', 'kinjal@jkdatalab.com')
     CONTACT_RECEIVER = os.environ.get('CONTACT_RECEIVER', 'kinjal@jkdatalab.com')
