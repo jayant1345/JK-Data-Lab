@@ -7,30 +7,30 @@ from utils.helpers import get_site_settings
 
 public_bp = Blueprint('public', __name__)
 
-# Simple in-memory rate limiter: ip -> list of timestamps
-_contact_log = {}
-# Same-name cooldown to catch bots that rotate IP/email but reuse a name
-_name_log = {}
-
 MIN_FILL_SECONDS = 3
+
+# Rate limits are backed by the ContactMessage table (not an in-memory
+# dict) because the app runs multiple gunicorn workers — a per-process
+# dict only sees a fraction of requests and lets bots slip through
+# whenever they land on a different worker.
 
 
 def _rate_limited(ip):
-    now = datetime.utcnow()
-    window = now - timedelta(hours=1)
-    times = [t for t in _contact_log.get(ip, []) if t > window]
-    _contact_log[ip] = times
-    return len(times) >= 3
+    window = datetime.utcnow() - timedelta(hours=1)
+    count = ContactMessage.query.filter(
+        ContactMessage.ip_address == ip,
+        ContactMessage.created_at > window,
+    ).count()
+    return count >= 3
 
 
 def _name_rate_limited(name):
-    now = datetime.utcnow()
-    key = name.strip().lower()
-    last = _name_log.get(key)
-    if last and now - last < timedelta(minutes=30):
-        return True
-    _name_log[key] = now
-    return False
+    window = datetime.utcnow() - timedelta(minutes=30)
+    count = ContactMessage.query.filter(
+        db.func.lower(ContactMessage.name) == name.strip().lower(),
+        ContactMessage.created_at > window,
+    ).count()
+    return count >= 1
 
 
 @public_bp.route('/')
@@ -107,13 +107,16 @@ def contact():
             flash('Thank you! Your message has been sent. We will respond within 24 hours.', 'success')
             return redirect(url_for('public.contact'))
 
-        # Timing trap: form was rendered with a timestamp; a real human
-        # takes more than a few seconds to fill it in.
+        # Timing trap: the form is rendered with a timestamp; a real
+        # human takes more than a few seconds to fill it in. A missing
+        # or unparseable timestamp means the request never actually
+        # loaded the form (a bot POSTing straight to this endpoint),
+        # which is just as suspicious as answering too fast.
         try:
-            rendered_at = int(request.form.get('ts', '0'))
-        except ValueError:
-            rendered_at = 0
-        if rendered_at and (time.time() - rendered_at) < MIN_FILL_SECONDS:
+            rendered_at = int(request.form.get('ts', ''))
+        except (TypeError, ValueError):
+            rendered_at = None
+        if rendered_at is None or (time.time() - rendered_at) < MIN_FILL_SECONDS:
             flash('Thank you! Your message has been sent. We will respond within 24 hours.', 'success')
             return redirect(url_for('public.contact'))
 
@@ -144,8 +147,6 @@ def contact():
         )
         db.session.add(msg)
         db.session.commit()
-
-        _contact_log.setdefault(ip, []).append(datetime.utcnow())
 
         # Send email via Resend API in background thread
         from flask import current_app
