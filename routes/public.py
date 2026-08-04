@@ -175,7 +175,6 @@ def contact():
         db.session.commit()
 
         # Send email via Resend API in background thread
-        from flask import current_app
         from utils.email import send_contact_email
         app_obj = current_app._get_current_object()
         form_data = dict(request.form)
